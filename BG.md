@@ -1,4 +1,3 @@
-![BANNER](/img/banner.png)
 # ⏱️ HASS - ГЪВКАВА ДАЙМЕР АВТОМАТИЗАЦИЯ
 [![PayPal дарение](https://img.shields.io/badge/PayPal-Дари-синьо?logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=AAWFZVF2XCP5A)
 ![Скрипт](https://img.shields.io/badge/logo-yaml-green?logo=yaml)

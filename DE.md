@@ -1,11 +1,18 @@
 # ⏱️ HASS - FLEXIBLE TIMER-AUTOMATISIERUNG  
-[![Home Assistant](https://img.shields.io/badge/🏠_Home_Assistant-41BDF5?logo=homeassistant)](https://www.home-assistant.io/) [![Donate via PayPal](https://img.shields.io/badge/PayPal-Donate-blue?logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=AAWFZVF2XCP5A)
-![Script](https://img.shields.io/badge/logo-yaml-green?logo=yaml)
-[![Български](https://img.shields.io/badge/BG_Български-език-green?logo=translate&labelColor=gray&style=flat-square&link=https://example.com/bg
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?color=ff00d8)](https://opensource.org/licenses/MIT)
+![GitHub last commit](https://img.shields.io/github/last-commit/Bacard1/HASS-Flexible-Timer.svg?color=ff00d8)
+[![hacs_badge](https://img.shields.io/badge/HACS-2025.5.3-orange.svg?color=ff00d8)](https://github.com/hacs/integration)
+
+[![Home Assistant](https://img.shields.io/badge/.-HOME_ASSISTANT-blue?logo=homeassistant)](https://www.home-assistant.io/) 
+[![Donate via PayPal](https://img.shields.io/badge/PayPal-DONATE-blue?logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=AAWFZVF2XCP5A)
+![Script](https://img.shields.io/badge/Script-YAML-blue?logo=yaml)
+
+[![Български](https://img.shields.io/badge/BG-ЕЗИК-gree?logo=translate&labelColor=gray&style=flat-square&link=https://example.com/bg
 )](BG.md)
-[![Deutch](https://img.shields.io/badge/DE_Deutsche-sprache-green?logo=translate&labelColor=gray&style=flat-square&link=https://example.com/bg
+[![Deutch](https://img.shields.io/badge/DE-SPRACHE-gree?logo=translate&labelColor=gray&style=flat-square&link=https://example.com/bg
 )](DE.md)
-[![English](https://img.shields.io/badge/EN_English-language-green?logo=translate&labelColor=gray&style=flat-square&link=https://example.com/bg)](README.md) 
+[![English](https://img.shields.io/badge/EN-LANGUAGE-gree?logo=translate&labelColor=gray&style=flat-square&link=https://example.com/bg)](README.md)
+
 
 🌟 **Dieses Projekt demonstriert eine vollständig dynamische, selbstausschaltende Timer-Automatisierung in Home Assistant, konfigurierbar über die Benutzeroberfläche (Stunden/Minuten/Sekunden).**  
 
@@ -13,25 +20,25 @@
 
 ## 📚 Inhaltsverzeichnis  
 - [⏱️ HASS - FLEXIBLE TIMER-AUTOMATISIERUNG](#️-hass---flexible-timer-automatisierung)
-	- [📚 Inhaltsverzeichnis](#-inhaltsverzeichnis)
-	- [📦 KERN-FUNKTIONEN](#-kern-funktionen)
-	- [🔧 KONFIGURATION](#-konfiguration)
-		- [1. Intervall einstellen `input_number`](#1-intervall-einstellen-input_number)
-		- [2. `input_datetime`: Speichert die Zeit der letzten Ausführung](#2-input_datetime-speichert-die-zeit-der-letzten-ausführung)
-		- [3. Automatisierung mit Timer-Logik](#3-automatisierung-mit-timer-logik)
-		- [4. Skripte zur Steuerung](#4-skripte-zur-steuerung)
-		- [5. Lovelace UI Beispiel](#5-lovelace-ui-beispiel)
-	- [🚀 Anwendungsbeispiele](#-anwendungsbeispiele)
-	- [💡 Professionelle Tipps](#-professionelle-tipps)
-	- [📊 Prozessdiagramm](#-prozessdiagramm)
-	- [🎨 Timer-Kartenvisualisierung](#-timer-kartenvisualisierung)
-		- [📱 Wie sieht die Karte aus?](#-wie-sieht-die-karte-aus)
-	- [📦 Erforderliche Zusatzpakete](#-erforderliche-zusatzpakete)
-	- [🔍 Code-Details](#-code-details)
-		- [Bubble Card Konfiguration](#bubble-card-konfiguration)
-		- [Numberbox Stile](#numberbox-stile)
-		- [Sichtbarkeitsbedingungen](#sichtbarkeitsbedingungen)
-	- [💡 Anpassung](#-anpassung)
+  - [📚 Inhaltsverzeichnis](#-inhaltsverzeichnis)
+  - [📦 KERN-FUNKTIONEN](#-kern-funktionen)
+  - [🔧 KONFIGURATION](#-konfiguration)
+    - [1. Intervall einstellen `input_number`](#1-intervall-einstellen-input_number)
+    - [2. `input_datetime`: Speichert die Zeit der letzten Ausführung](#2-input_datetime-speichert-die-zeit-der-letzten-ausführung)
+    - [3. Automatisierung mit Timer-Logik](#3-automatisierung-mit-timer-logik)
+    - [4. Skripte zur Steuerung](#4-skripte-zur-steuerung)
+    - [5. Lovelace UI Beispiel](#5-lovelace-ui-beispiel)
+  - [🚀 Anwendungsbeispiele](#-anwendungsbeispiele)
+  - [💡 Professionelle Tipps](#-professionelle-tipps)
+  - [📊 Prozessdiagramm](#-prozessdiagramm)
+  - [🎨 Timer-Kartenvisualisierung](#-timer-kartenvisualisierung)
+    - [📱 Wie sieht die Karte aus?](#-wie-sieht-die-karte-aus)
+  - [📦 Erforderliche Zusatzpakete](#-erforderliche-zusatzpakete)
+  - [🔍 Code-Details](#-code-details)
+    - [Bubble Card Konfiguration](#bubble-card-konfiguration)
+    - [Numberbox Stile](#numberbox-stile)
+    - [Sichtbarkeitsbedingungen](#sichtbarkeitsbedingungen)
+  - [💡 Anpassung](#-anpassung)
 
 ---
 

@@ -1,11 +1,10 @@
 ![BANNER](/img/banner.png)
+# ⏱️ Home Assistant Flexible Timer Automation
 [![PayPal Donation](https://img.shields.io/badge/PayPal-Дари-синьо?logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=AAWFZVF2XCP5A)
 ![Script](https://img.shields.io/badge/logo-yaml-green?logo=yaml)
 [![БЪЛГАРСКИ](https://img.shields.io/badge/БЪЛГАРСКИ-език-green?logo=translate&labelColor=gray&style=flat-square&link=https://example.com/en)](BG.md)
 
-# ⏱️ Home Assistant Flexible Timer Automation
-
-> This project demonstrates how to create a fully dynamic, self-disabling timer-based automation in Home Assistant, configurable in hours, minutes, and seconds from the UI.
+This project demonstrates how to create a fully dynamic, self-disabling timer-based automation in Home Assistant, configurable in hours, minutes, and seconds from the UI.
 
 ---
 

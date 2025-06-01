@@ -1,34 +1,34 @@
 ![BANNER](/img/banner.png)
+# ⏱️ HASS - ГЪВКАВА ДАЙМЕР АВТОМАТИЗАЦИЯ
 [![PayPal дарение](https://img.shields.io/badge/PayPal-Дари-синьо?logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=AAWFZVF2XCP5A)
 ![Скрипт](https://img.shields.io/badge/logo-yaml-green?logo=yaml)
-[![English](https://img.shields.io/badge/ENGLISH-language-green?logo=translate&labelColor=gray&style=flat-square&link=https://example.com/en)](README.md)
+[![English](https://img.shields.io/badge/EN_English-language-green?logo=translate&labelColor=gray&style=flat-square&link=https://example.com/bg)](README.md)
+[![Български](https://img.shields.io/badge/BG_Български-език-green?logo=translate&labelColor=gray&style=flat-square&link=https://example.com/bg
+)](BG.md)
+[![Home Assistant](https://img.shields.io/badge/🏠_Home_Assistant-41BDF5?logo=homeassistant)](https://www.home-assistant.io/)  
 
-
-# ⏱️ Home Assistant - Гъвкава Таймер Автоматизация
-
-> Този проект демонстрира как да създадете напълно динамична, самоизключваща се таймерна автоматизация в Home Assistant, конфигурируема през потребителския интерфейс (ч/мин/сек).
+Този проект демонстрира как да създадете напълно динамична, самоизключваща се таймерна автоматизация в Home Assistant, конфигурируема през потребителския интерфейс (ч/мин/сек).
 
 ---
 
-## 📚 Съдържание
-
-- [⏱️ Home Assistant - Гъвкава Таймер Автоматизация](#️-home-assistant---гъвкава-таймер-автоматизация)
-  - [📚 Съдържание](#-съдържание)
-  - [📦 Основни функции](#-основни-функции)
-  - [🔧 Конфигурация](#-конфигурация)
-    - [1. `input_number`: Задаване на интервал](#1-input_number-задаване-на-интервал)
+## 📚 съдържание:
+- [⏱️ HASS - ГЪВКАВА ДАЙМЕР АВТОМАТИЗАЦИЯ](#️-hass---гъвкава-даймер-автоматизация)
+  - [📚 съдържание:](#-съдържание)
+  - [📦 ОСНОВНИ ФУНКЦИИ:](#-основни-функции)
+  - [🔧 КАТЕГОРИЯ:](#-категория)
+    - [1. ЗАДАВАНЕ НА ИНТЕРВАЛ `input_number`:](#1-задаване-на-интервал-input_number)
     - [2. `input_datetime`: Съхранява времето на последно изпълнение](#2-input_datetime-съхранява-времето-на-последно-изпълнение)
     - [3. Автоматизация с таймерна логика и самоизключване](#3-автоматизация-с-таймерна-логика-и-самоизключване)
     - [4. Скриптове за старт и нулиране](#4-скриптове-за-старт-и-нулиране)
     - [5. Lovelace UI пример](#5-lovelace-ui-пример)
   - [✅ Примери за употреба](#-примери-за-употреба)
   - [💡 Съвети](#-съвети)
+  - [Скрипт на картата:](#скрипт-на-картата)
   - [📊 Диаграма на процеса](#-диаграма-на-процеса)
 
 ---
 
-## 📦 Основни функции
-
+## 📦 ОСНОВНИ ФУНКЦИИ:
 - 🕒 Задаване на интервал през UI (часове, минути, секунди)
 - ⚙️ Изпълнение на действия след края на интервала
 - 💾 Съхранява време на последно изпълнение
@@ -38,26 +38,22 @@
 
 ---
 
-## 🔧 Конфигурация
+## 🔧 КАТЕГОРИЯ:
+### 1. ЗАДАВАНЕ НА ИНТЕРВАЛ `input_number`: 
 
-### 1. `input_number`: Задаване на интервал
-
-```yaml
-input_number:
-  interval_hours:
-    name: Интервал - Часове
-    min: 0
-    max: 23
-    step: 1
-    unit_of_measurement: "ч"
-
-  interval_minutes:
-    name: Интервал - Минути
-    min: 0
+| | | | |
+|----------------------------|----------------------------|----------------------------|
+| ```yaml                         | ```yaml                         |          |```yaml
+  interval_seconds:
+    name: Интервал - Секунди
+    min: 5
     max: 59
     step: 1
-    unit_of_measurement: "мин"
+    unit_of_measurement: "сек"
+```
 
+
+```yaml
   interval_seconds:
     name: Интервал - Секунди
     min: 5
@@ -202,6 +198,103 @@ cards:
 - Скриптът `reset_interval_timer` е идеален за нулиране без рестарт
 
 ---
+
+## Скрипт на картата:
+
+```yaml
+type: vertical-stack
+cards:
+  - type: custom:bubble-card
+    name: TIMER
+    card_type: pop-up
+    hash: "#timer"
+    card_layout: normal
+    bg_blur: ""
+    width_desktop: ""
+    bg_opacity: ""
+    shadow_opacity: ""
+    hide_backdrop: true
+  - type: vertical-stack
+    cards:
+      - type: entities
+        title: ⏱️ Interval Settings
+        entities:
+          - type: custom:numberbox-card
+            entity: input_number.interval_hours
+            name: Hours
+            unit: h.
+          - type: custom:numberbox-card
+            entity: input_number.interval_minutes
+            name: Minutes
+            unit: min.
+          - type: custom:numberbox-card
+            entity: input_number.interval_seconds
+            name: Seconds
+          - entity: input_datetime.last_execution_time
+        card_mod:
+          style: |
+            ha-card {
+              border: 3px outset black;
+              background: rgba(0, 0, 0, 0.35); /* Black background with 25% transparency */
+              color: White;
+              font-weight: 650;
+              text-shadow: 0px 0px 5px black;  # White shadow centered on text
+            }
+      - show_name: true
+        show_icon: false
+        type: button
+        name: ▶️ START
+        icon: mdi:restart
+        tap_action:
+          action: call-service
+          service: script.reset_interval_timer
+        grid_options:
+          columns: 6
+          rows: 1
+        visibility:
+          - condition: state
+            entity: automation.taimer
+            state_not: "on"
+        card_mod:
+          style: |
+            ha-card {
+              border: 3px outset black;
+              background: rgba(0, 0, 0, 0.35); /* Black background with 25% transparency */
+              color: White;
+              font-weight: 650;
+              text-shadow: 0px 0px 5px black;  # White shadow centered on text
+            }
+      - show_name: true
+        show_icon: false
+        type: button
+        name: ⏹️ STOP
+        icon: mdi:stop
+        tap_action:
+          action: perform-action
+          target:
+            entity_id: script.unknown_3
+          perform_action: script.turn_on
+        grid_options:
+          columns: 6
+          rows: 1
+        visibility:
+          - condition: state
+            entity: automation.taimer
+            state_not: "off"
+        card_mod:
+          style: |
+            ha-card {
+              border: 3px outset black;
+              background: rgba(0, 0, 0, 0.35); /* Black background with 25% transparency */
+              color: White;
+              font-weight: 650;
+              text-shadow: 0px 0px 5px black;  # White shadow centered on text
+            }
+grid_options:
+  rows: auto
+  columns: 11
+
+```
 
 ## 📊 Диаграма на процеса
 

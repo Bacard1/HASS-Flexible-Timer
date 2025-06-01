@@ -1,233 +1,285 @@
-# ⏱️ Home Assistant Flexible Timer Automation
-[![PayPal Donation](https://img.shields.io/badge/PayPal-Дари-синьо?logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=AAWFZVF2XCP5A)
+# ⏱️ HASS - FLEXIBLE TIMER AUTOMATION  
+[![PayPal Donation](https://img.shields.io/badge/PayPal-Donate-blue?logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=AAWFZVF2XCP5A)
 ![Script](https://img.shields.io/badge/logo-yaml-green?logo=yaml)
-[![БЪЛГАРСКИ](https://img.shields.io/badge/БЪЛГАРСКИ-език-green?logo=translate&labelColor=gray&style=flat-square&link=https://example.com/en)](BG.md)
+[![Bulgarian](https://img.shields.io/badge/BG_Български-language-green?logo=translate&labelColor=gray&style=flat-square)](BG.md)
+[![Home Assistant](https://img.shields.io/badge/🏠_Home_Assistant-41BDF5?logo=homeassistant)](https://www.home-assistant.io/)  
 
-This project demonstrates how to create a fully dynamic, self-disabling timer-based automation in Home Assistant, configurable in hours, minutes, and seconds from the UI.
+🌟 **This project demonstrates a fully dynamic, self-disabling timer automation in Home Assistant, configurable via UI (hours/minutes/seconds).**  
 
 ---
 
-## 📚 Table of Contents
-
-- [⏱️ Home Assistant Flexible Timer Automation](#️-home-assistant-flexible-timer-automation)
+## 📚 Table of Contents  
+- [⏱️ HASS - FLEXIBLE TIMER AUTOMATION](#️-hass---flexible-timer-automation)
   - [📚 Table of Contents](#-table-of-contents)
-  - [📦 Features](#-features)
-  - [🔧 Configuration](#-configuration)
-    - [1. `input_number`: User-defined time interval](#1-input_number-user-defined-time-interval)
-    - [2. `input_datetime`: Stores last execution time](#2-input_datetime-stores-last-execution-time)
-    - [3. Automation: Timer logic with self-disable](#3-automation-timer-logic-with-self-disable)
-    - [4. Scripts: Start and Reset helpers](#4-scripts-start-and-reset-helpers)
+  - [📦 KEY FEATURES](#-key-features)
+  - [🔧 CONFIGURATION](#-configuration)
+    - [1. Interval Setting `input_number`](#1-interval-setting-input_number)
+    - [2. `input_datetime`: Store Last Execution Time](#2-input_datetime-store-last-execution-time)
+    - [3. Timer Logic Automation](#3-timer-logic-automation)
+    - [4. Control Scripts](#4-control-scripts)
     - [5. Lovelace UI Example](#5-lovelace-ui-example)
-  - [✅ Example Use Cases](#-example-use-cases)
-  - [💡 Tips \& Recommendations](#-tips--recommendations)
-  - [📊 Workflow Diagram](#-workflow-diagram)
+  - [🚀 Usage Examples](#-usage-examples)
+  - [💡 Pro Tips](#-pro-tips)
+  - [📊 Process Diagram](#-process-diagram)
+  - [🎨 Timer Card Visualization](#-timer-card-visualization)
+    - [📱 What Does the Card Look Like?](#-what-does-the-card-look-like)
+  - [📦 Required Additional Packages](#-required-additional-packages)
+  - [🔍 Code Details](#-code-details)
+    - [Bubble Card Configuration](#bubble-card-configuration)
+    - [Numberbox Styles](#numberbox-styles)
+    - [Visibility Conditions](#visibility-conditions)
+  - [💡 Customization](#-customization)
 
 ---
 
-## 📦 Features
-
-- 🕒 Customizable interval via `input_number` in **hours**, **minutes**, and **seconds**
-- ⚙️ Executes any action at the end of the interval
-- 💾 Uses `input_datetime` to store last execution time
-- 🧠 Prevents premature execution with intelligent time difference check
-- 🔘 Includes UI controls: Start, Stop, Reset
-- ✅ Automation disables itself after each execution
+## 📦 KEY FEATURES  
+- 🕒 **UI Configuration** (hours/minutes/seconds)  
+- ⚡ **Self-disabling** after execution  
+- 🔄 **Reset** without restart  
+- 📅 **Stores** last execution time  
+- 🛡️ **Prevents** false triggers  
 
 ---
 
-## 🔧 Configuration
+## 🔧 CONFIGURATION  
 
-### 1. `input_number`: User-defined time interval
-
-These helpers allow the user to set the desired interval through the UI.
-
+### 1. Interval Setting `input_number`  
 ```yaml
 input_number:
   interval_hours:
-    name: Interval Hours
+    name: "Interval - Hours"
     min: 0
-    max: 23
+    max: 24
     step: 1
     unit_of_measurement: "h"
-
+    
   interval_minutes:
-    name: Interval Minutes
+    name: "Interval - Minutes"
     min: 0
     max: 59
     step: 1
     unit_of_measurement: "min"
-
+    
   interval_seconds:
-    name: Interval Seconds
-    min: 5
+    name: "Interval - Seconds"
+    min: 5  # Minimum 5 sec for stability
     max: 59
     step: 1
     unit_of_measurement: "sec"
 ```
+> 💡 *Defines the interval. Values are summed automatically (1h + 30min = 5400 sec).*
 
-### 2. `input_datetime`: Stores last execution time
+---
 
-This stores the timestamp of the last time the automation executed. It is used to calculate whether the interval has passed.
-
+### 2. `input_datetime`: Store Last Execution Time  
 ```yaml
 input_datetime:
   last_execution_time:
-    name: Last Execution Time
+    name: "Last Execution"
     has_date: true
     has_time: true
 ```
+> ⏳ *This component records when the timer last started. Critical for calculations!*
 
-### 3. Automation: Timer logic with self-disable
+---
 
-This automation checks every second if the interval has passed. If yes, it performs an action, updates the last execution time, and disables itself.
-
+### 3. Timer Logic Automation  
 ```yaml
 automation:
-  - alias: "⏱️TIMER"
+  - alias: "⏱️ TIMER"
     id: auto_flexible_interval
-    description: "Automation with configurable interval (h/m/s)"
-    mode: single
-    max_exceeded: silent
+    description: "Executes action after set interval"
     trigger:
       - platform: time_pattern
-        seconds: "/1"
-    condition:
-      - condition: template
-        value_template: >
-          {% set h = states('input_number.interval_hours') | int %}
-          {% set m = states('input_number.interval_minutes') | int %}
-          {% set s = states('input_number.interval_seconds') | int %}
-          {% set interval = h * 3600 + m * 60 + s %}
-          {% set last = states('input_datetime.last_execution_time') %}
-          {% if last not in ['unknown', 'unavailable'] %}
-            {% set last_dt = strptime(last, '%Y-%m-%d %H:%M:%S') %}
-            {% set delta = (now().replace(tzinfo=None) - last_dt).total_seconds() %}
-            {{ delta >= interval }}
-          {% else %}
-            false
-          {% endif %}
+        seconds: "/1"  # Checks every second
+    condition: >
+      {% set h = states('input_number.interval_hours') | int %}
+      {% set m = states('input_number.interval_minutes') | int %}
+      {% set s = states('input_number.interval_seconds') | int %}
+      {% set interval = h * 3600 + m * 60 + s %}
+      {% set last = states('input_datetime.last_execution_time') %}
+      {{ (now() - strptime(last, '%Y-%m-%d %H:%M:%S')).total_seconds() >= interval if last not in ['unknown', 'unavailable'] else false %}
     action:
-      - service: notify.roditeli
+      - service: notify.all_devices  # 👈 Replace with your service!
         data:
-          title: "🕒 Timer Automation"
-          message: "Executed at {{ now().strftime('%H:%M:%S') }}"
-
+          message: "🔄 Action executed at {{ now().strftime('%H:%M:%S') }}"
+          
       - service: input_datetime.set_datetime
         data:
           entity_id: input_datetime.last_execution_time
           datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
-
-      - delay: 2
-
-      - service: automation.turn_off
-        data:
-          stop_actions: true
+          
+      - delay: 00:00:02  # Brief pause before disabling
+      
+      - service: automation.turn_off  # 🔌 SELF-DISABLING
         target:
           entity_id: "{{ this.entity_id }}"
 ```
+> 🔍 **How It Works?**  
+> 1️⃣ Checks every second if interval has elapsed  
+> 2️⃣ Calculates total time in seconds  
+> 3️⃣ Compares with last execution  
+> 4️⃣ If condition met → executes action and disables itself  
 
-### 4. Scripts: Start and Reset helpers
+---
 
-Scripts used to initialize or manually reset the timer.
-
+### 4. Control Scripts  
 ```yaml
 script:
   start_interval_timer:
-    alias: "▶️ Start Interval Timer"
+    alias: "▶️ Start Timer"
     sequence:
-      - service: input_datetime.set_datetime
+      - service: input_datetime.set_datetime  # 📌 Sets initial time
         data:
           entity_id: input_datetime.last_execution_time
           datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
-
-      - service: automation.turn_on
+          
+      - service: automation.turn_on  # 🚀 Starts automation
         target:
           entity_id: automation.auto_flexible_interval
 
   reset_interval_timer:
-    alias: "🔄 Reset Timer Only"
+    alias: "🔄 Reset Timer"
     sequence:
-      - service: input_datetime.set_datetime
+      - service: input_datetime.set_datetime  # 🔄 Updates time without stopping
         data:
           entity_id: input_datetime.last_execution_time
           datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
 ```
 
-### 5. Lovelace UI Example
+---
 
-Full UI stack to control and view the timer.
-
+### 5. Lovelace UI Example  
 ```yaml
 type: vertical-stack
 cards:
   - type: entities
-    title: ⏱️ Timer Settings
+    title: "⏱️ Control Panel"
     entities:
       - input_number.interval_hours
       - input_number.interval_minutes
       - input_number.interval_seconds
       - input_datetime.last_execution_time
+      
+  - type: horizontal-stack
+    cards:
+      - type: button
+        name: "▶️ START"
+        icon: mdi:play
+        tap_action:
+          action: call-service
+          service: script.start_interval_timer
+          
+      - type: button
+        name: "🔄 RESET"
+        icon: mdi:restart
+        tap_action:
+          action: call-service
+          service: script.reset_interval_timer
+          
+      - type: button
+        name: "⏹️ STOP"
+        icon: mdi:stop
+        tap_action:
+          action: call-service
+          service: automation.turn_off
+          target:
+            entity_id: automation.auto_flexible_interval
+```
+> 🎨 *Customize with `card-mod` for 3D buttons and animations!*
 
-  - type: button
-    name: ▶️ Start Timer
-    icon: mdi:play
-    tap_action:
-      action: call-service
-      service: script.start_interval_timer
+---
 
-  - type: button
-    name: 🔄 Reset Timer
-    icon: mdi:restart
-    tap_action:
-      action: call-service
-      service: script.reset_interval_timer
+## 🚀 Usage Examples  
+- **🌡️ AC**: Turn off after 2 hours  
+- **💡 Lights**: Night mode (30min)  
+- **🔔 Notifications**: Reminder every 15 minutes  
 
-  - type: button
-    name: ⏹️ Stop Timer
-    icon: mdi:stop
-    tap_action:
-      action: call-service
-      service: automation.turn_off
-      target:
-        entity_id: automation.auto_flexible_interval
+---
+
+## 💡 Pro Tips  
+1. **⏱️ Precision**: Use `seconds: "/1"` for second-level accuracy  
+2. **🔄 Reset**: Always use `reset_interval_timer` script instead of manual setting  
+3. **📊 Visualization**: Add `history_graph` to track executions  
+
+---
+
+## 📊 Process Diagram
+
+![img](/img/diagram.png)
+
+## 🎨 Timer Card Visualization
+
+### 📱 What Does the Card Look Like?
+Your timer card will appear as a modern, semi-transparent control panel with three main sections:
+
+1. **⏱️ Interval Settings**  
+   - Three columns for hours/minutes/seconds with styled +/- buttons  
+   - Shows current set time (e.g., "0h 5min 30s")  
+   - Bottom row shows last execution (e.g., "5/20 8:30 PM")
+
+2. **🔼 START Button**  
+   - Green accent (typically)  
+   - Starts timer via `script.reset_interval_timer`  
+   - Visible only when automation is off  
+
+3. **🔴 STOP Button**  
+   - Red accent  
+   - Stops automation via `script.turn_on`  
+   - Visible only when automation is active  
+
+## 📦 Required Additional Packages
+To make the card work, install these add-ons:
+
+```yaml
+# In HACS (Home Assistant Community Store):
+- bubble-card (for pop-up effect)
+- numberbox-card (for styled numeric inputs)
+- card-mod (for CSS customization)
+- button-card (for additional effects)
 ```
 
----
+## 🔍 Code Details
 
-## ✅ Example Use Cases
-
-- Turn off a device after a user-defined time delay
-- Send a notification reminder after a set period
-- Dynamically change automation schedules without editing YAML files
-
----
-
-## 💡 Tips & Recommendations
-
-- To improve precision, set the `trigger` to check every second: `seconds: "/1"`
-- Always use `script.start_interval_timer` to begin a new interval. It sets the correct `input_datetime` value so that the automation doesn't trigger prematurely.
-- You can use `reset_interval_timer` without affecting automation state (handy for testing or skipping a scheduled run).
-
----
-
-## 📊 Workflow Diagram
-
-```mermaid
-graph TD
-    A[User sets interval via UI] --> B[Click Start Timer (script)]
-    B --> C[Record current time in input_datetime]
-    C --> D[Enable automation]
-    D --> E[Automation checks time every second]
-    E --> F{Interval passed?}
-    F -- Yes --> G[Run action (notify, etc)]
-    G --> H[Update input_datetime to now]
-    H --> I[Disable automation]
-    F -- No --> E
+### Bubble Card Configuration
+```yaml
+type: custom:bubble-card
+name: TIMER
+card_type: pop-up  # Creates "pop-out" effect
+hide_backdrop: true  # Hides background
 ```
 
+### Numberbox Styles
+```yaml
+type: custom:numberbox-card
+entity: input_number.interval_seconds
+name: Seconds
+unit: s.  # Shows units
+card_mod:
+  style: |
+    ha-card {
+      border-radius: 15px;  # Rounded corners
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);  # 3D effect
+    }
+```
+
+### Visibility Conditions
+```yaml
+visibility:
+  - condition: state
+    entity: automation.taimer
+    state_not: "on"  # Shows START only when timer is off
+```
+
+## 💡 Customization
+1. **Colors**: Change `rgba(0, 0, 0, 0.35)` to other colors (e.g., `rgba(25, 25, 112, 0.4)` for midnight blue)
+2. **Animations**: Add `transition: all 0.3s ease;` for smooth hover effects
+3. **Icons**: Replace `mdi:restart` with other icons from [Material Design Icons](https://materialdesignicons.com/)
+
+Result:  
+![Timer Visualization](/img/timer_card.png)
+
 ---
-
-> [!TIP]  
-> If you enjoyed this project, you can find more interesting repositories [HERE](https://github.com/Bacard1?tab=repositories).  
-> If you need help or have any questions, feel free to contact me.
-
+> [!TIP]
+> If you like this project, find more interesting repositories [HERE](https://github.com/Bacard1?tab=repositories).  
+> For questions or issues, don't hesitate to contact me.
